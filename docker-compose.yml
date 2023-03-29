@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+
+  php:
+    image: php:7.4-cli
+    volumes: [ ./php:/php ]
+    entrypoint: bash /php/run.sh
+    depends_on: [ mysql, mysql-migrator ]
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+  # Uncomment for persistent database
+  # volumes: [ mysql_data:/var/lib/mysql ]
+
+  mysql-migrator:
+    image: mysql:5.7
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes: [ ./migrator:/migrator ]
+    entrypoint: bash /migrator/run.sh
+    depends_on: [ mysql ]
+  # Uncomment for persistent database
+  #volumes:
+  #mysql_data:
